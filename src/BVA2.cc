@@ -389,55 +389,79 @@ Assignment* BVA2Solver::solve( vector<Clause*>& formula, uint32_t vc )
 	  }
 	  
 	  if (debug > 0 ) cerr << "c new variable " << newX << " reduces formula by: " << currentReduction  << " with " << matchingLiterals.size() << " lits" << endl;
-	  
+
 	  Lit replaceLit = Lit( newX, NEG );
-	  
-	  assert( matchingLiterals.size() <= matchingClauses.size() ); 
-	  
+
+	  assert( matchingLiterals.size() <= matchingClauses.size() );
+
 	  for( uint32_t i = 0 ; i < matchingLiterals.size(); ++ i ) {
 	    vector<Clause*>& list = matchingClauses[i];
-	    if( i == 0 ) {	
-	      
-	      
-	      for( uint32_t j = 0 ; j < list.size(); ++ j )
+	    if( i == 0 ) {
+
+	      for( uint32_t j = 0; j < matchingLiterals.size(); ++j ) {
+                cout << "r " << newX << " " << matchingLiterals[j].nr() << " 0" << endl;
+	      }
+
+	      for( uint32_t j = 0 ; j < list.size(); ++j )
 	      {
-		if( list[j] == 0 ) continue; 
-		bool replaceFlag = false;
+		if( list[j] == 0 ) continue;
                 cout << "r " << replaceLit.nr() << " ";
+                for( uint32_t k = 0 ; k < list [j]->size(); ++k ) {
+                  Lit tmp = list [j]->get_literal( k );
+                  if (tmp != right) cout << tmp.nr() << " ";
+                }
+                cout << "0" << endl;
+              }
+
+	      for( uint32_t j = 0 ; j < list.size(); ++j )
+	      {
+		if( list[j] == 0 ) continue;
+                cout << "d ";
+                for( uint32_t k = 0 ; k< list [j]->size(); ++k )
+                  cout << list[j]->get_literal(k).nr() << " ";
+                cout << "0" << endl;
+              }
+
+	      for( uint32_t j = 0 ; j < list.size(); ++j )
+	      {
+		if( list[j] == 0 ) continue;
+		bool replaceFlag = false;
+ //               cout << "r " << replaceLit.nr() << " ";
                 for( uint32_t k = 0 ; k< list [j]->size(); ++k ) {
                   if( list [j]->get_literal( k ) == right ) {
                     list [j]->set_literal( k, replaceLit );
                     occCount[ right.toIndex() ] --;
                     replaceFlag = true;
                   }
-                  Lit tmp = list [j]->get_literal( k );
-                  if (tmp != replaceLit) cout << tmp.nr() << " ";
+//                  Lit tmp = list [j]->get_literal( k );
+//                  if (tmp != replaceLit) cout << tmp.nr() << " ";
                 }
-                cout << "0" << endl;
+//                cout << "0" << endl;
 		if( !replaceFlag ) {
 		  cerr << "c could not replace literal " << right.nr() << " to " << replaceLit.nr() << " in clause "; printClause( list[j] );
 		  assert( replaceFlag );
 		}
-	      
-		
+
+
 		for( uint32_t k = 0 ; k < occ[ right.toIndex() ].size(); ++k ) {
 		  if( list[j] == occ[ right.toIndex() ][k] ) {
-		    occ[ right.toIndex() ][k] = occ[ right.toIndex() ][ occ[ right.toIndex() ].size() - 1 ];
+                    occ[ right.toIndex() ][k] = occ[ right.toIndex() ][ occ[ right.toIndex() ].size() - 1 ];
 		    occ[ right.toIndex() ].pop_back();
 		    break;
 		  }
 		}
-		
-		
+
 		occ[ replaceLit.toIndex() ]. push_back( list[j] );
-		
 		occCount[ replaceLit.toIndex() ] ++;
 	      }
+
 	    } else {
 	      assert( list.size() == matchingClauses[0].size() );
-	      
+
 	      for( uint32_t j = 0 ; j < list.size(); ++ j ) {
-		if( matchingClauses[0][j] != 0 && list[j] != 0 ) removeClause( list[j] ); 
+		if( matchingClauses[0][j] != 0 && list[j] != 0 ) {
+                  removeClause( list[j] );
+                }
 	      }
 	    }
 	  }
@@ -469,15 +493,12 @@ Assignment* BVA2Solver::solve( vector<Clause*>& formula, uint32_t vc )
 	    work.insert_item( right.data() );
 	  }
 	  if( push > 1 ) {
-	    if( matchingLiterals.size() > 2 ) work.insert_item( Lit( newX, POS ).data() ); 
+	    if( matchingLiterals.size() > 2 ) work.insert_item( Lit( newX, POS ).data() );
 	    work.insert_item( Lit( newX, NEG ).data() );
 	  }
 
-	
-	  
-	} 
-	
-	} 
+	}
+	}
 
 	break_BVA:;
 
@@ -750,6 +771,11 @@ void BVA2Solver::printFormula(vector<Clause*>& formula)
 }
 
 void BVA2Solver::removeClause( Clause* clause ) {
+  cout << "d";
+  for ( uint32_t i = 0 ; i < clause->size(); ++i )
+    cout << " " << clause->get_literal(i).nr();
+  cout << " 0" << endl;
+
   for( uint32_t i = 0 ; i < clause->size(); ++i ) {
     vector< Clause* >& list = occ[ clause->get_literal(i).toIndex() ];
     
