@@ -403,13 +403,17 @@ Assignment* BVA2Solver::solve( vector<Clause*>& formula, uint32_t vc )
 	      {
 		if( list[j] == 0 ) continue; 
 		bool replaceFlag = false;
-		for( uint32_t k = 0 ; k< list [j]->size(); ++k ) {
-		  if( list [j]->get_literal( k ) == right ) { 
-		    list [j]->set_literal( k, replaceLit );
-		    occCount[ right.toIndex() ] --;
-		    replaceFlag = true;
-		  }
-		}
+                cout << "r " << replaceLit.nr() << " ";
+                for( uint32_t k = 0 ; k< list [j]->size(); ++k ) {
+                  if( list [j]->get_literal( k ) == right ) {
+                    list [j]->set_literal( k, replaceLit );
+                    occCount[ right.toIndex() ] --;
+                    replaceFlag = true;
+                  }
+                  Lit tmp = list [j]->get_literal( k );
+                  if (tmp != replaceLit) cout << tmp.nr() << " ";
+                }
+                cout << "0" << endl;
 		if( !replaceFlag ) {
 		  cerr << "c could not replace literal " << right.nr() << " to " << replaceLit.nr() << " in clause "; printClause( list[j] );
 		  assert( replaceFlag );
