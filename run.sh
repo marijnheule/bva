@@ -1,6 +1,6 @@
 INPUT=$1
 
-./formula -method=BVA2 -file= $INPUT -print=1 -limit=-1 | grep -v "UNKNOWN" > tmp-$$.txt
+./bva -method=BVA2 -file= $INPUT -print=1 -limit=-1 | grep -v "UNKNOWN" > tmp-$$.txt
 
 cat tmp-$$.txt | grep "r " | sed 's|r ||' > proof-$$.drat
 cat tmp-$$.txt | grep -v "r " > formula-$$.cnf
